@@ -1,0 +1,12 @@
+<h1>bridge</h1><pre id="o"></pre>
+<script>
+var out = "typeof deals = " + (typeof deals) + " | ";
+if (typeof deals !== "undefined") {
+  var n = [];
+  for (var k in deals) { n.push(k); }
+  out += "count=" + n.length + " | " + n.join(",");
+} else {
+  out += "NOT EXPOSED";
+}
+document.getElementById('o').textContent = out;
+</script>
