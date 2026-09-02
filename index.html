@@ -1,26 +1,48 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-<body style="background:#0a0e0a;color:#00ff66;font-family:monospace;font-size:15px;padding:16px;">
-<h2>deals bridge — type check</h2>
-<pre id="o">running...</pre>
-<script>
-var o = document.getElementById('o');
-try {
-  var names = ["goBack","initEsimFlowActivation","initHybridUAEPassLogin",
-               "initHybridUAEPassFR","shareQrCode","openChangeplan","redirectToCart"];
-  var out = "typeof deals = " + (typeof deals) + "\n\n";
-  if (typeof deals !== "undefined") {
-    for (var i=0;i<names.length;i++){
-      out += names[i] + " : " + (typeof deals[names[i]]) + "\n";
-    }
-  } else {
-    out += "bridge NOT exposed on this origin";
-  }
-  o.textContent = out;
-} catch (e) {
-  o.textContent = "ERROR: " + e;
-}
-</script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="background:#0a0e0a;color:#00ff66;font-family:monospace;padding:16px;">
+    <h2>Deals Bridge - Invoke Methods</h2>
+    <button onclick="invokeBridge('goBack')">Go Back</button>
+    <button onclick="invokeBridge('initEsimFlowActivation')">Init eSIM</button>
+    <button onclick="invokeBridge('shareQrCode')">Share QR</button>
+    <button onclick="invokeBridge('redirectToCart')">Go to Cart</button>
+    <pre id="status">Ready...</pre>
+
+    <script>
+        function invokeBridge(method) {
+            const status = document.getElementById('status');
+            
+            if (typeof deals === 'undefined' || deals === null) {
+                status.textContent = '❌ Bridge not available';
+                return;
+            }
+            
+            if (typeof deals[method] !== 'function') {
+                status.textContent = `❌ Method "${method}" not found or not a function`;
+                return;
+            }
+            
+            try {
+                deals[method]();
+                status.textContent = `✅ Called: ${method}`;
+                console.log(`Bridge method "${method}" invoked successfully`);
+            } catch (error) {
+                status.textContent = `❌ Error calling ${method}: ${error.message}`;
+            }
+        }
+        
+        // Check bridge availability on load
+        window.onload = function() {
+            if (typeof deals !== 'undefined' && deals !== null) {
+                document.getElementById('status').textContent = '✅ Bridge available';
+            } else {
+                document.getElementById('status').textContent = '⏳ Waiting for bridge...';
+            }
+        };
+    </script>
 </body>
 </html>
