@@ -1,10 +1,9 @@
-<h1>bridge invoke test</h1><pre id="o"></pre>
 <script>
-var o = document.getElementById('o');
-var out = "typeof deals = " + (typeof deals) + "\n";
-out += "typeof goBack = " + (typeof deals.goBack) + "\n";
-if (typeof deals.goBack === "function") {
-  out += "goBack is callable — NOT invoking (would close the view)\n";
+var names = ["goBack","initEsimFlowActivation","initHybridUAEPassLogin",
+             "initHybridUAEPassFR","shareQrCode","openChangeplan"];
+var out = "typeof deals = " + (typeof deals) + "\n\n";
+for (var i=0;i<names.length;i++){
+  out += names[i] + " : " + (typeof deals[names[i]]) + "\n";
 }
-o.textContent = out;
+document.getElementById('o').textContent = out;
 </script>
