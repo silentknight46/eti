@@ -1,9 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="background:#0a0e0a;color:#00ff66;font-family:monospace;font-size:15px;padding:16px;">
+<h2>deals bridge — type check</h2>
+<pre id="o">running...</pre>
 <script>
-var names = ["goBack","initEsimFlowActivation","initHybridUAEPassLogin",
-             "initHybridUAEPassFR","shareQrCode","openChangeplan"];
-var out = "typeof deals = " + (typeof deals) + "\n\n";
-for (var i=0;i<names.length;i++){
-  out += names[i] + " : " + (typeof deals[names[i]]) + "\n";
+var o = document.getElementById('o');
+try {
+  var names = ["goBack","initEsimFlowActivation","initHybridUAEPassLogin",
+               "initHybridUAEPassFR","shareQrCode","openChangeplan","redirectToCart"];
+  var out = "typeof deals = " + (typeof deals) + "\n\n";
+  if (typeof deals !== "undefined") {
+    for (var i=0;i<names.length;i++){
+      out += names[i] + " : " + (typeof deals[names[i]]) + "\n";
+    }
+  } else {
+    out += "bridge NOT exposed on this origin";
+  }
+  o.textContent = out;
+} catch (e) {
+  o.textContent = "ERROR: " + e;
 }
-document.getElementById('o').textContent = out;
 </script>
+</body>
+</html>
