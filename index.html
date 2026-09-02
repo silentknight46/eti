@@ -2,14 +2,9 @@
 <script>
 var o = document.getElementById('o');
 var out = "typeof deals = " + (typeof deals) + "\n";
-if (typeof deals !== "undefined") {
-  try {
-    // benign, log-only method — proves native invocation with attacker data
-    deals.JavascriptInterfaceLogs("POC_MOINKHOKHAR_" + Date.now());
-    out += "invoked deals.JavascriptInterfaceLogs() OK\n";
-  } catch (e) {
-    out += "JavascriptInterfaceLogs threw: " + e + "\n";
-  }
+out += "typeof goBack = " + (typeof deals.goBack) + "\n";
+if (typeof deals.goBack === "function") {
+  out += "goBack is callable — NOT invoking (would close the view)\n";
 }
 o.textContent = out;
 </script>
