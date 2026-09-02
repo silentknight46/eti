@@ -3,46 +3,211 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background: #0a0e0a;
+            color: #00ff66;
+            font-family: monospace;
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #1a2e1a;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #00ff66;
+            color: #0a0e0a;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        #status {
+            background: #0d1a0d;
+            padding: 16px;
+            border: 1px solid #00ff66;
+            margin-top: 20px;
+            min-height: 60px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success { color: #00ff66; }
+        .error { color: #ff4444; }
+        .info { color: #66aaff; }
+        h3 { color: #66ff99; margin-top: 20px; }
+    </style>
 </head>
-<body style="background:#0a0e0a;color:#00ff66;font-family:monospace;padding:16px;">
-    <h2>Deals Bridge - Invoke Methods</h2>
-    <button onclick="invokeBridge('goBack')">Go Back</button>
-    <button onclick="invokeBridge('initEsimFlowActivation')">Init eSIM</button>
-    <button onclick="invokeBridge('shareQrCode')">Share QR</button>
-    <button onclick="invokeBridge('redirectToCart')">Go to Cart</button>
-    <pre id="status">Ready...</pre>
+<body>
+    <h2>🚀 Deals Bridge Interface</h2>
+    <p>Bridge Type: <span id="bridgeType">Checking...</span></p>
+    <p>Methods Count: <span id="methodCount">0</span></p>
+    
+    <div class="btn-grid" id="buttonContainer"></div>
+    
+    <div id="status">Ready to invoke bridge methods...</div>
 
     <script>
+        const statusDiv = document.getElementById('status');
+        
+        // All 30 methods
+        const methods = [
+            'checkingCameraEligibility',
+            'checkingEsimEligibility',
+            'closeHelpMeDecide',
+            'downloadQrCode',
+            'enableLocationEsimPermission',
+            'enableLocationPermission',
+            'goBack',
+            'goToCartScreen',
+            'initDeviceInstatlion',
+            'initEsimFlowActivation',
+            'initHybridAddToCart',
+            'initHybridConfirmButtonClicked',
+            'initHybridLogin',
+            'initHybridRenewalRegistration',
+            'initHybridRenewalRegistrationLater',
+            'initHybridShareDocument',
+            'initHybridUAEPassFR',
+            'initHybridUAEPassLogin',
+            'initHybridUseAnotherMethodClicked',
+            'openChangeplan',
+            'openChangeplanSelectedSku',
+            'openControlLine',
+            'openEmaratiCategoryPage',
+            'redirectToCart',
+            'redirectToDeliveryReview',
+            'redirectToReviewOrder',
+            'resumeOnBack',
+            'scanningBarCode',
+            'shareQrCode',
+            'tryAgainMethodClicked'
+        ];
+
+        // Display bridge info
+        function updateBridgeInfo() {
+            const bridgeType = document.getElementById('bridgeType');
+            const methodCount = document.getElementById('methodCount');
+            
+            if (typeof deals !== 'undefined' && deals !== null) {
+                bridgeType.textContent = '✅ Available (object)';
+                bridgeType.style.color = '#00ff66';
+                methodCount.textContent = methods.length;
+                methodCount.style.color = '#00ff66';
+                return true;
+            } else {
+                bridgeType.textContent = '❌ Not available';
+                bridgeType.style.color = '#ff4444';
+                methodCount.textContent = '0';
+                return false;
+            }
+        }
+
+        // Invoke bridge method
         function invokeBridge(method) {
-            const status = document.getElementById('status');
+            statusDiv.innerHTML = `⏳ Calling: <strong>${method}</strong>...`;
+            statusDiv.className = 'info';
             
             if (typeof deals === 'undefined' || deals === null) {
-                status.textContent = '❌ Bridge not available';
+                statusDiv.innerHTML = '❌ Bridge not available!';
+                statusDiv.className = 'error';
                 return;
             }
             
             if (typeof deals[method] !== 'function') {
-                status.textContent = `❌ Method "${method}" not found or not a function`;
+                statusDiv.innerHTML = `❌ Method "${method}" is not a function`;
+                statusDiv.className = 'error';
                 return;
             }
             
             try {
-                deals[method]();
-                status.textContent = `✅ Called: ${method}`;
-                console.log(`Bridge method "${method}" invoked successfully`);
+                const result = deals[method]();
+                statusDiv.innerHTML = `✅ Successfully invoked: <strong>${method}</strong>\nReturn value: ${JSON.stringify(result, null, 2) || 'undefined'}`;
+                statusDiv.className = 'success';
             } catch (error) {
-                status.textContent = `❌ Error calling ${method}: ${error.message}`;
+                statusDiv.innerHTML = `❌ Error calling ${method}:\n${error.message || error}`;
+                statusDiv.className = 'error';
             }
         }
-        
-        // Check bridge availability on load
+
+        // Create buttons for all methods
+        function createButtons() {
+            const container = document.getElementById('buttonContainer');
+            container.innerHTML = '';
+            
+            // Group methods by category
+            const categories = {
+                'Navigation': ['goBack', 'goToCartScreen', 'resumeOnBack'],
+                'Eligibility': ['checkingCameraEligibility', 'checkingEsimEligibility', 
+                               'enableLocationEsimPermission', 'enableLocationPermission'],
+                'eSIM': ['initEsimFlowActivation', 'initDeviceInstatlion', 'scanningBarCode'],
+                'UAE Pass': ['initHybridUAEPassLogin', 'initHybridUAEPassFR'],
+                'Hybrid': ['initHybridAddToCart', 'initHybridConfirmButtonClicked', 
+                          'initHybridLogin', 'initHybridRenewalRegistration',
+                          'initHybridRenewalRegistrationLater', 'initHybridShareDocument',
+                          'initHybridUseAnotherMethodClicked'],
+                'Plan': ['openChangeplan', 'openChangeplanSelectedSku', 
+                        'openControlLine', 'openEmaratiCategoryPage'],
+                'Redirects': ['redirectToCart', 'redirectToDeliveryReview', 'redirectToReviewOrder'],
+                'QR': ['shareQrCode', 'downloadQrCode'],
+                'Utils': ['closeHelpMeDecide', 'tryAgainMethodClicked']
+            };
+
+            // Create category headers and buttons
+            for (const [category, methodList] of Object.entries(categories)) {
+                // Add category header
+                const header = document.createElement('div');
+                header.style.cssText = 'grid-column: 1 / -1; color: #66ff99; margin-top: 10px; font-weight: bold; border-bottom: 1px solid #1a3a1a; padding-bottom: 5px;';
+                header.textContent = `📁 ${category}`;
+                container.appendChild(header);
+
+                // Add buttons for each method in category
+                methodList.forEach(method => {
+                    if (methods.includes(method)) {
+                        const btn = document.createElement('button');
+                        btn.textContent = method;
+                        btn.title = `Invoke ${method}`;
+                        btn.onclick = () => invokeBridge(method);
+                        container.appendChild(btn);
+                    }
+                });
+            }
+        }
+
+        // Initialize
         window.onload = function() {
-            if (typeof deals !== 'undefined' && deals !== null) {
-                document.getElementById('status').textContent = '✅ Bridge available';
+            const bridgeAvailable = updateBridgeInfo();
+            createButtons();
+            
+            if (bridgeAvailable) {
+                statusDiv.innerHTML = '✅ Bridge ready! Click any button to invoke a method.';
+                statusDiv.className = 'success';
             } else {
-                document.getElementById('status').textContent = '⏳ Waiting for bridge...';
+                statusDiv.innerHTML = '⚠️ Bridge not available. Make sure you are running inside the native app WebView.';
+                statusDiv.className = 'error';
             }
         };
+
+        // Check periodically if bridge becomes available
+        let checkInterval = setInterval(() => {
+            if (typeof deals !== 'undefined' && deals !== null) {
+                updateBridgeInfo();
+                clearInterval(checkInterval);
+            }
+        }, 1000);
     </script>
 </body>
 </html>
